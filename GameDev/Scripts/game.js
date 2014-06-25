@@ -111,9 +111,9 @@ Q.Sprite.extend("Alien", {
         });
 
         this.p.y = this.p.h;
-
         this.add("animation");
         this.play("default");
+        this.add("BasicAI");
     }
 });
 
@@ -139,15 +139,29 @@ Q.Sprite.extend("Shot", {
 Q.component("BasicAI", {
 
     added: function () {
-        this.entity.changeDirections();
-        entity.on("step", "move");
+        this.entity.changeDirection();
+        this.entity.on("step", "move");
     },
 
-    extend: function () {
-        move: function(){
+    extend: {
+        changeDirection: function () {
+            var entity = this;
+            var numberOfSeconds = Math.floor((Math.random() * 2) + 1);
+            setTimeout(function () {
+                entity.p.speed *= -1;
+                entity.changeDirection();
+            }, numberOfSeconds * 1000);
+        },
+
+        move: function (dt) {
+            var entity = this;
+            entity.p.x -= entity.p.speed * dt;
+            if (entity.p.x > Q.el.width - (entity.p.w / 2) ||
+                entity.p.x < 0 + (entity.p.w / 2)) {
+                entity.p.speed *= -1
+            }
         }
     }
-
 });
 
 Q.component("Gun", {
